@@ -153,4 +153,14 @@ Healthcare organisations process thousands of medical PDFs daily. Manual review 
 
 ---
 
-## Repository Structure
+## Disclaimer
+
+This repository contains only architectural diagrams, project documentation, and high-level educational material produced during the internship. **No proprietary source code, company credentials, internal API implementations, database connection strings, AWS resource identifiers, or confidential business logic are included.** All diagrams and documentation are representations of work done and do not expose any internal systems or trade secrets of DataDives.
+
+---
+
+## Author
+
+**P. Pushyamithra**
+Data Engineering Intern — DataDives
+January 2026 – May 2026
