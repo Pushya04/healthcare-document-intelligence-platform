@@ -1,121 +1,153 @@
-# DPDP-Compliant Healthcare Document Intelligence Platform
+# Healthcare Document Intelligence Platform
+
+> **Data Engineering Internship Project — DataDives**
+> Role: Data Engineer Intern | Duration: January 2026 - May 2026
+
+---
 
 ## Overview
 
-This project was developed during my internship at DataDives as a Data Engineering Intern. The platform focuses on secure healthcare document processing using OCR automation, intelligent PII detection, and compliance-oriented workflows aligned with India’s Digital Personal Data Protection (DPDP) Act 2023.
+Healthcare Document Intelligence Platform is a cloud-native, multi-tenant medical document processing platform built during my Data Engineering Internship at DataDives. The platform automates OCR extraction, PII detection, structured data storage, and full DPDP Act 2023 compliance workflows for healthcare documents such as lab reports, prescriptions, and discharge summaries.
 
-The system processes healthcare documents such as prescriptions, lab reports, and discharge summaries while ensuring secure handling of sensitive patient information through masking, encryption, immutable audit logging, and consent-driven access control.
+The system processes sensitive patient data — Aadhaar numbers, phone numbers, names, clinical values — and enforces masking, KMS encryption, consent-gated access, immutable audit trails, and data subject rights across every layer.
 
 ---
 
 ## Problem Statement
 
-Healthcare organizations process thousands of medical PDFs daily containing sensitive information such as:
-- Patient Names
-- Aadhaar Numbers
-- Phone Numbers
-- Clinical Data
-- Prescription Information
+Healthcare organisations process thousands of medical PDFs daily. Manual review is:
+- Time-consuming and error-prone
+- Unable to scale with document volume
+- Lacking standardised PII protection
+- Without audit trail for HIPAA / DPDPA compliance
 
-Manual review and masking of such information is not scalable. The objective of this platform was to automate OCR extraction, PII detection, secure storage, and compliance workflows using a cloud-native architecture.
+**This platform solves all of the above through a fully automated, compliance-first pipeline.**
+
+---
+
+## Architecture Diagrams
+
+### System Architecture — Complete Platform Flow
+![Complete Flow Diagram](docs/diagrams/complete_flow_diagram.png)
+
+### Upload + OCR + PII Processing — Sequence Diagram
+![Sequence Diagram](docs/diagrams/sequence_diagram_ocr_pii.png)
+
+### PII Detection + Triple Storage + Audit Chain
+![PII Detection Flow](docs/diagrams/pii_detection_audit_chain.png)
+
+### RBAC + ABAC + DSR + Compliance Workflow
+![RBAC DSR Flow](docs/diagrams/rbac_dsr_compliance_flow.png)
+
+### Use Case Diagram — All Actors and Roles
+![Use Case Diagram](docs/diagrams/use_case_diagram.png)
 
 ---
 
 ## Key Features
 
-### OCR & Document Intelligence
-- OCR extraction using AWS Textract
-- Sync and Async OCR workflows
-- Document classification:
-  - LAB_REPORT
-  - PRESCRIPTION
-  - OTHER
-- Text normalization and structured extraction
+### OCR and Document Intelligence
+- AWS Textract integration — sync (single-page) and async (multi-page with polling)
+- Automatic PDF repair pipeline using PyPDF2 on Textract rejection
+- Document classification: `LAB_REPORT` / `PRESCRIPTION` / `OTHER`
+- Text normalisation — de-hyphenation, line merging, whitespace cleanup
+- Structured key-value extraction — patient name, Aadhaar, phone, lab values, medications
 
-### PII Detection & Protection
-- AWS Comprehend-based NLP detection
-- Regex fallback validation
-- Aadhaar, PAN, Phone, Email detection
-- Multi-layer protection:
-  - Masking
-  - SHA-256 Hashing
-  - AWS KMS Encryption
+### PII Detection and Protection
+- **Primary:** AWS Comprehend — detects NAME, PHONE, EMAIL, AADHAAR, PAN, SSN, CREDIT_CARD, ADDRESS, DATE, AGE, PASSPORT and more
+- **Fallback:** Regex engine — Aadhaar pattern, PAN pattern, Indian mobile numbers, email
+- **Triple storage per finding:**
+  - `masked_value` — always shown in API (e.g. `98XXXXXX10`)
+  - `hashed_value` — SHA-256 for lookup without raw exposure
+  - `value_raw_encrypted` — AWS KMS AES-256 encrypted, admin-only decryption
+- Reconciliation engine — backfills extracted rows with masked values automatically
 
-### Security & Compliance
-- JWT Authentication
-- Role-Based Access Control (RBAC)
-- Consent-Gated Unmasking
-- Immutable Audit Logging
-- Data Subject Rights (DSR) workflows
-- Legal Hold & Retention Policies
-
-### Cloud-Native Architecture
-- AWS EC2
-- AWS S3
-- AWS Textract
-- AWS Comprehend
-- AWS KMS
-- PostgreSQL RDS
+### Security and Compliance
+- JWT HS256 authentication with tenant_id, user_id, role claims
+- RBAC (admin / staff / viewer) + ABAC (ownership, environment, purpose)
+- Break-glass emergency access with justification and approval workflow
+- Consent management — grant / withdraw / verify per user per purpose
+- Immutable SHA-256 hash-chained audit logs — tamper-evident
+- Data Subject Rights (DSR) — access export, field correction, document erasure
+- OTP-based identity verification before DSR operations
+- Legal hold — prevents deletion even during automated retention scheduler
+- Retention scheduler — auto-purge past retention_days with deletion certificates
+- Policy versioning — DRAFT → ACTIVE → rollback workflow
+- Compliance evidence pack — downloadable JSON/CSV with chain integrity check
 
 ---
 
 ## Technology Stack
 
-| Category | Technologies |
+| Category | Technology |
 |---|---|
-| Backend | FastAPI, Python |
-| Database | PostgreSQL |
-| Cloud | AWS EC2, S3, RDS |
-| OCR | AWS Textract |
-| NLP | AWS Comprehend |
-| Security | JWT, AWS KMS |
-| Storage | S3 |
-| Dev Tools | GitHub, Ubuntu |
+| Backend Framework | FastAPI (Python) |
+| Database | PostgreSQL 14 on AWS RDS |
+| Cloud Compute | AWS EC2 Ubuntu 24 |
+| Document Storage | AWS S3 (tenant-scoped) |
+| OCR Engine | AWS Textract (Sync + Async) |
+| PII Detection | AWS Comprehend + Regex fallback |
+| Encryption | AWS KMS (Symmetric AES-256) |
+| Authentication | JWT HS256 |
+| PDF Handling | PyPDF2 |
+| DB Driver | psycopg2 |
+| Deployment | Uvicorn ASGI |
 
 ---
 
-## Architecture Highlights
-
-- Multi-tenant healthcare document processing
-- Async OCR orchestration for large PDFs
-- Tenant-aware isolation and secure access control
-- Hash-chained immutable audit logging
-- Compliance-oriented healthcare workflows
+## Database Schema — 18 Tables
 
 ---
 
-## Security Features
+## API Surface
 
-- AES-256 encryption using AWS KMS
-- SHA-256 tamper-evident audit chain
-- Consent-based access workflows
-- Role-based masking enforcement
-- Secure HTTPS communication
-- IAM least-privilege architecture
+52 endpoints across the following functional groups:
 
----
-
-## Learning Outcomes
-
-This internship provided hands-on experience in:
-- Cloud-native backend engineering
-- OCR system orchestration
-- AWS architecture
-- Privacy-focused healthcare systems
-- Compliance engineering
-- Multi-tenant system design
-- Production-oriented API development
+- Document Upload and Management
+- OCR Trigger and Results
+- Structured Data Extraction
+- PII Detection Summary
+- Consent Management
+- Data Subject Rights (DSR)
+- Policy Management and Versioning
+- Encryption Key Management
+- Data Classification Registry
+- Audit Logs and Statistics
+- Compliance Evidence Pack
+- Retention and Legal Hold
+- Break-Glass Access
+- Incident Response
+- System Health Check
 
 ---
 
-## Disclaimer
+## DPDP Act 2023 Compliance Coverage
 
-This repository contains only high-level architectural and educational material developed as part of an internship project. No proprietary company source code, credentials, internal APIs, or confidential implementation details are included.
+| DPDP Requirement | Implementation |
+|---|---|
+| Data Minimisation | PII masked by default in all API responses |
+| Purpose Limitation | Policy engine restricts PII access by role and purpose |
+| Consent Management | Grant / withdraw / verify per user per purpose |
+| Right of Access | DSR access request with masked export |
+| Right to Correction | Field-level correction with admin approval |
+| Right to Erasure | Document deletion with legal hold check and deletion certificate |
+| Retention Limits | Automated scheduler with per-tenant retention policies |
+| Breach Notification | Incident records with scope, datasets, and actions taken |
+| Audit Trail | SHA-256 hash-chained immutable logs |
+| Encryption at Rest | AWS KMS encrypted raw PII values |
 
 ---
 
-## Author
+## What I Built During This Internship
 
-P. Pushyamithra  
-B.Tech CSE — IIIT Guwahati  
-Data Engineering Intern — DataDives
+- Provisioned complete AWS infrastructure from scratch — EC2, RDS, S3, KMS, IAM with least-privilege policies
+- Designed and implemented the 18-table PostgreSQL schema with multi-tenancy, cascade deletes, and foreign key constraints
+- Built the FastAPI backend by implementing all project stories
+- Integrated AWS Textract with sync/async routing, PDF validation, and auto-repair pipeline
+- Integrated AWS Comprehend for PII detection with Regex fallback and reconciliation engine
+- Implemented SHA-256 hash-chained audit logging for tamper-evident compliance
+- Built the complete DPDP compliance stack — consent, DSR, retention, policy versioning, evidence pack
+
+---
+
+## Repository Structure
