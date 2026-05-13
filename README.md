@@ -28,19 +28,22 @@ Healthcare organisations process thousands of medical PDFs daily. Manual review 
 ## Architecture Diagrams
 
 ### System Architecture — Complete Platform Flow
-![Complete Flow Diagram](docs/diagrams/complete_flow_diagram.png)
+[![Complete Flow Diagram](Complete_flow_diagram.png)](Complete_flow_diagram.png)
 
-### Upload + OCR + PII Processing — Sequence Diagram
-![Sequence Diagram](docs/diagrams/sequence_diagram_ocr_pii.png)
+### Upload Sequence Diagram
+[![Sequence Diagram Upload](sequence_diagram_upload.png.png)](sequence_diagram_upload.png.png)
+
+### OCR + PII Processing — Sequence Diagram
+[![Sequence Diagram OCR PII](sequence_diagram_ocr_pii.png.png)](sequence_diagram_ocr_pii.png.png)
 
 ### PII Detection + Triple Storage + Audit Chain
-![PII Detection Flow](docs/diagrams/pii_detection_audit_chain.png)
+[![PII Detection Audit Chain](pii_detection_audit_chain.png.png)](pii_detection_audit_chain.png.png)
 
 ### RBAC + ABAC + DSR + Compliance Workflow
-![RBAC DSR Flow](docs/diagrams/rbac_dsr_compliance_flow.png)
+[![RBAC DSR Compliance Flow](rbac_dsr_compliance_flow.png.png)](rbac_dsr_compliance_flow.png.png)
 
 ### Use Case Diagram — All Actors and Roles
-![Use Case Diagram](docs/diagrams/use_case_diagram.png)
+[![Use Case Diagram](use_case_diagram.png.png)](use_case_diagram.png.png)
 
 ---
 
